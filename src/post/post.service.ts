@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { CreatePostDto } from './dto';
 
 @Injectable()
 export class PostService {
@@ -9,11 +12,8 @@ export class PostService {
   async create(createPostDto: CreatePostDto, userId: string) {
     const newPost = await this.prisma.post.create({
       data: {
-        title: createPostDto.title,
         content: createPostDto.content,
-        published: createPostDto.published,
-        publishDate: createPostDto.publishDate,
-        authorId: userId,
+        ownerId: userId,
       },
     });
 
@@ -21,8 +21,12 @@ export class PostService {
   }
 
   async findAll() {
-    const posts = await this.prisma.post.findMany({});
-
+    const posts = await this.prisma.post.findMany({
+      include: {
+        likes: true,
+        comments: true,
+      },
+    });
     return posts;
   }
 
@@ -30,6 +34,10 @@ export class PostService {
     const post = await this.prisma.post.findUnique({
       where: {
         id: id,
+      },
+      include: {
+        likes: true,
+        comments: true,
       },
     });
 
@@ -39,19 +47,59 @@ export class PostService {
     return post;
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto, userId: string) {
-    return `This action updates a #${id} post`;
+  async remove(id: string, userId: string) {
+    const post = await this.prisma.post.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    if (post.ownerId !== userId) {
+      throw new ForbiddenException("You're not the owner of this post");
+    }
+
+    await this.prisma.post.delete({
+      where: {
+        id: id,
+      },
+    });
   }
 
-  async remove(id: string, userId: string) {
-    try {
-      await this.prisma.user.delete({
+  async like(id: string, userId: string) {
+    const post = await this.prisma.post.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const existingLike = await this.prisma.like.findFirst({
+      where: {
+        postId: id,
+        userId: userId,
+      },
+    });
+
+    if (existingLike) {
+      await this.prisma.like.delete({
         where: {
-          id: id,
+          id: existingLike.id,
         },
       });
-    } catch (error) {
-      throw new NotFoundException();
+    } else {
+      await this.prisma.like.create({
+        data: {
+          userId: userId,
+          postId: id,
+        },
+      });
     }
   }
 }

@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   HttpCode,
@@ -11,8 +10,7 @@ import {
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId, Public } from 'src/common/decorators';
 
 @ApiTags('post')
@@ -21,6 +19,7 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
+  @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.CREATED)
   create(
     @Body() createPostDto: CreatePostDto,
@@ -31,27 +30,29 @@ export class PostController {
 
   @Public()
   @Get()
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.postService.findAll();
   }
 
   @Public()
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string) {
     return this.postService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePostDto: UpdatePostDto,
-    @GetCurrentUserId() userId: string,
-  ) {
-    return this.postService.update(id, updatePostDto, userId);
-  }
-
   @Delete(':id')
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @GetCurrentUserId() userId: string) {
     return this.postService.remove(id, userId);
+  }
+
+  @Post('like:id')
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  like(@Param('id') id: string, @GetCurrentUserId() userId: string) {
+    return this.postService.like(id, userId);
   }
 }
