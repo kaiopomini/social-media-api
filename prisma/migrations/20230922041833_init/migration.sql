@@ -33,15 +33,15 @@ CREATE TABLE "Posts" (
 );
 
 -- CreateTable
-CREATE TABLE "PostResponses" (
+CREATE TABLE "Comments" (
     "id" UUID NOT NULL,
     "content" TEXT NOT NULL,
     "ownerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "parentId" UUID NOT NULL,
+    "postId" UUID NOT NULL,
 
-    CONSTRAINT "PostResponses_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Comments_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -49,7 +49,6 @@ CREATE TABLE "Likes" (
     "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "postResponseId" UUID,
     "postId" UUID,
 
     CONSTRAINT "Likes_pkey" PRIMARY KEY ("id")
@@ -65,10 +64,7 @@ CREATE UNIQUE INDEX "Profiles_userId_key" ON "Profiles"("userId");
 CREATE INDEX "Posts_ownerId_idx" ON "Posts"("ownerId");
 
 -- CreateIndex
-CREATE INDEX "PostResponses_parentId_idx" ON "PostResponses"("parentId");
+CREATE INDEX "Comments_postId_idx" ON "Comments"("postId");
 
 -- CreateIndex
 CREATE INDEX "Likes_postId_idx" ON "Likes"("postId");
-
--- CreateIndex
-CREATE INDEX "Likes_postResponseId_idx" ON "Likes"("postResponseId");
