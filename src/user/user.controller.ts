@@ -57,4 +57,11 @@ export class UserController {
   remove(@GetCurrentUserId() userId: string, @Param('id') id: string) {
     return this.userService.remove(userId, id);
   }
+
+  @Post(':id')
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.OK)
+  toggleFollow(@GetCurrentUserId() userId: string, @Param('id') id: string) {
+    return this.userService.toggleFollow(userId, id);
+  }
 }

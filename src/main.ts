@@ -8,7 +8,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Documentação - kipSharing')
+    .setTitle('Documentation - Social media API')
     .setDescription('')
     .setVersion('1.0')
     .addBearerAuth(

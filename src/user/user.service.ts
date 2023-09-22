@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { Tokens } from 'src/auth/types';
@@ -59,8 +60,14 @@ export class UserService {
 
   async findOne(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
-      where: {
-        id: id,
+      where: { id },
+      include: {
+        posts: true,
+        profile: true,
+        userFollowed: true,
+        userFollowing: true,
+        comments: true,
+        likes: true,
       },
     });
 
@@ -115,6 +122,44 @@ export class UserService {
       });
     } catch (error) {
       throw new NotFoundException();
+    }
+  }
+
+  async toggleFollow(userId: string, userToFollowId: string) {
+    if (userId === userToFollowId) {
+      throw new BadRequestException("You can't follow yourself");
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const existingFollow = await this.prisma.follow.findFirst({
+      where: {
+        userFollowingId: userId,
+        userFollowedId: userToFollowId,
+      },
+    });
+
+    if (existingFollow) {
+      await this.prisma.follow.delete({
+        where: {
+          id: existingFollow.id,
+        },
+      });
+    } else {
+      await this.prisma.follow.create({
+        data: {
+          userFollowingId: userId,
+          userFollowedId: userToFollowId,
+        },
+      });
     }
   }
 }
