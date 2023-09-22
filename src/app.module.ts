@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { ConfigModule } from '@nestjs/config';
 import { CommentModule } from './comment/comment.module';
+import { FeedModule } from './feed/feed.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CommentModule } from './comment/comment.module';
     UserModule,
     PostModule,
     CommentModule,
+    FeedModule,
   ],
   providers: [
     {
