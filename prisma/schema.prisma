@@ -12,15 +12,19 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  hash      String
-  hashedRT  String?
-  posts     Post[]
-  profile   Profile?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  hash          String
+  hashedRT      String?
+  posts         Post[]
+  profile       Profile?
+  userFollowed  Follow[]  @relation("Followers")
+  userFollowing Follow[]  @relation("Following")
+  comments      Comment[]
+  likes         Like[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@map("users")
 }
@@ -52,23 +56,40 @@ model Post {
 model Comment {
   id        String   @id @default(uuid()) @db.Uuid
   content   String
-  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String   @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   postId    String   @db.Uuid
   parent    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId])
+  @@index([ownerId])
   @@map("Comments")
 }
 
 model Like {
   id        String   @id @default(uuid()) @db.Uuid
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.Uuid
   createdAt DateTime @default(now())
   post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String?  @db.Uuid
 
+  @@index([userId])
   @@index([postId])
   @@map("Likes")
+}
+
+model Follow {
+  id              String   @id @default(uuid()) @db.Uuid
+  userFollowed    User     @relation("Followers", fields: [userFollowedId], references: [id])
+  userFollowedId  String   @db.Uuid
+  userFollowing   User     @relation("Following", fields: [userFollowingId], references: [id])
+  userFollowingId String   @db.Uuid
+  createdAt       DateTime @default(now())
+
+  @@index([userFollowedId])
+  @@index([userFollowingId])
+  @@map("Follows")
 }
