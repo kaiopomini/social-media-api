@@ -1,25 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsEmail,
-  Matches,
-  IsString,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class AuthDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsEmail()
+  @IsString()
+  @Transform(({ value }) => value.toLowerCase())
   email: string;
 
   @ApiProperty()
-  @MinLength(4)
-  @MaxLength(20)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'password too weak',
-  })
   @IsNotEmpty()
   @IsString()
   password: string;
