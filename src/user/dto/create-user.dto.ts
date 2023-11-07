@@ -16,7 +16,7 @@ export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsEmail()
-  @Transform(({ value }) => value.toLowerCase())
+  @Transform(({ value }) => value?.toLowerCase()?.trim())
   email: string;
 
   @ApiProperty()

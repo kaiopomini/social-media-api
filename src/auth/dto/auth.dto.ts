@@ -6,7 +6,7 @@ export class AuthDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @Transform(({ value }) => value.toLowerCase())
+  @Transform(({ value }) => value?.toLowerCase()?.trim())
   email: string;
 
   @ApiProperty()
