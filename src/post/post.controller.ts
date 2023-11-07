@@ -29,30 +29,30 @@ export class PostController {
   }
 
   @Public()
-  @Get()
+  @Get('user/:userId')
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.postService.findAll();
+  findAllFromUser(@Param('userId') userId: string) {
+    return this.postService.findAllFromUser(userId);
   }
 
   @Public()
-  @Get(':id')
+  @Get(':postId')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(id);
+  findOne(@Param('postId') postId: string) {
+    return this.postService.findOne(postId);
   }
 
-  @Delete(':id')
+  @Delete(':postId')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string, @GetCurrentUserId() userId: string) {
-    return this.postService.remove(id, userId);
+  remove(@Param('postId') postId: string, @GetCurrentUserId() userId: string) {
+    return this.postService.remove(postId, userId);
   }
 
-  @Post('like:id')
+  @Post('like/:postId')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.NO_CONTENT)
-  like(@Param('id') id: string, @GetCurrentUserId() userId: string) {
-    return this.postService.like(id, userId);
+  like(@Param('postId') postId: string, @GetCurrentUserId() userId: string) {
+    return this.postService.like(postId, userId);
   }
 }

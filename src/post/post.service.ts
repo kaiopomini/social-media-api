@@ -20,8 +20,11 @@ export class PostService {
     return newPost;
   }
 
-  async findAll() {
+  async findAllFromUser(userId: string) {
     const posts = await this.prisma.post.findMany({
+      where: {
+        ownerId: userId,
+      },
       include: {
         likes: true,
         comments: true,
@@ -30,10 +33,10 @@ export class PostService {
     return posts;
   }
 
-  async findOne(id: string) {
+  async findOne(postId: string) {
     const post = await this.prisma.post.findUnique({
       where: {
-        id: id,
+        id: postId,
       },
       include: {
         likes: true,
@@ -47,10 +50,10 @@ export class PostService {
     return post;
   }
 
-  async remove(id: string, userId: string) {
+  async remove(postId: string, userId: string) {
     const post = await this.prisma.post.findUnique({
       where: {
-        id: id,
+        id: postId,
       },
     });
 
@@ -64,15 +67,15 @@ export class PostService {
 
     await this.prisma.post.delete({
       where: {
-        id: id,
+        id: postId,
       },
     });
   }
 
-  async like(id: string, userId: string) {
+  async like(postId: string, userId: string) {
     const post = await this.prisma.post.findUnique({
       where: {
-        id: id,
+        id: postId,
       },
     });
 
@@ -82,7 +85,7 @@ export class PostService {
 
     const existingLike = await this.prisma.like.findFirst({
       where: {
-        postId: id,
+        postId: postId,
         userId: userId,
       },
     });
@@ -97,7 +100,7 @@ export class PostService {
       await this.prisma.like.create({
         data: {
           userId: userId,
-          postId: id,
+          postId: postId,
         },
       });
     }

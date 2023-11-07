@@ -37,14 +37,6 @@ export class CommentService {
     return newComment;
   }
 
-  findAll() {
-    return `This action returns all comment`;
-  }
-
-  findOne(id: string) {
-    return `This action returns a #${id} comment`;
-  }
-
   async remove(commentId: string, userId: string) {
     const comment = await this.prisma.comment.findUnique({
       where: {

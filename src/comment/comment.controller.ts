@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Param,
@@ -29,20 +28,13 @@ export class CommentController {
     return this.commentService.create(postId, createCommentDto, userId);
   }
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(id);
-  }
-
-  @Delete(':id')
+  @Delete(':commentId')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string, @GetCurrentUserId() userId: string) {
-    return this.commentService.remove(id, userId);
+  remove(
+    @Param('commentId') commentId: string,
+    @GetCurrentUserId() userId: string,
+  ) {
+    return this.commentService.remove(commentId, userId);
   }
 }
