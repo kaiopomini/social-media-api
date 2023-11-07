@@ -33,11 +33,6 @@ export class UserService {
       data: {
         email: createUserDto.email,
         name: createUserDto.name,
-        profile: {
-          create: {
-            bio: createUserDto.bio,
-          },
-        },
         hash: hash,
       },
     });
