@@ -82,8 +82,6 @@ export class FeedService {
 
     if (
       user?.userFollowing.some((followingUser: any) => {
-        console.log(followingUser.userFollowedId);
-        console.log(post.ownerId);
         return followingUser.userFollowedId === post.ownerId;
       })
     ) {

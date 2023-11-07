@@ -26,6 +26,7 @@ export class PostService {
         ownerId: userId,
       },
       include: {
+        owner: true,
         likes: true,
         comments: true,
       },
@@ -39,6 +40,7 @@ export class PostService {
         id: postId,
       },
       include: {
+        owner: true,
         likes: true,
         comments: true,
       },
