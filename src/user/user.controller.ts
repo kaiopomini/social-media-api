@@ -44,12 +44,6 @@ export class UserController {
     return this.userService.findAll(name, email, page, perPage);
   }
 
-  @Get(':id')
-  @Public()
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.userService.findOne(id);
-  }
-
   @Patch('self')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
@@ -77,7 +71,13 @@ export class UserController {
   @Get('self')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
-  me(@GetCurrentUserId() userId: string) {
+  getMe(@GetCurrentUserId() userId: string) {
     return this.userService.findOne(userId);
+  }
+
+  @Get(':id')
+  @Public()
+  findOne(@Param('id') id: string): Promise<User> {
+    return this.userService.findOne(id);
   }
 }

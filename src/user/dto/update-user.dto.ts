@@ -7,7 +7,9 @@ export class UpdateUserDto {
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    required: false,
+  })
   @IsString()
   @IsOptional()
   bio: string;

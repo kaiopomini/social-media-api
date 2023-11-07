@@ -33,6 +33,11 @@ export class UserService {
       data: {
         email: createUserDto.email,
         name: createUserDto.name,
+        profile: {
+          create: {
+            bio: '',
+          },
+        },
         hash: hash,
       },
     });
@@ -64,21 +69,28 @@ export class UserService {
     if (name) {
       where.name = {
         contains: name,
+        mode: 'insensitive',
       };
     }
 
     if (email) {
       where.email = {
         contains: email,
+        mode: 'insensitive',
       };
     }
     const users = await this.prisma.user.findMany({
       where,
-      skip: (page - 1) * perPage,
-      take: perPage,
+      skip: (+page - 1) * +perPage,
+      take: +perPage,
+      include: {
+        profile: true,
+        userFollowed: true,
+        userFollowing: true,
+      },
     });
     const totalUsers = await this.prisma.user.count({ where });
-    const totalPages = Math.ceil(totalUsers / perPage);
+    const totalPages = Math.ceil(totalUsers / +perPage);
 
     const returnUsers = users.map((user) => {
       delete user.hash;
@@ -88,9 +100,9 @@ export class UserService {
     return { data: returnUsers, total: totalUsers, page, perPage, totalPages };
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(userId: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
       include: {
         posts: true,
         profile: true,
@@ -125,6 +137,9 @@ export class UserService {
               bio: updateUserDto.bio,
             },
           },
+        },
+        include: {
+          profile: true,
         },
       });
     } catch (error) {
