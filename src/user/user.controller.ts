@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Query,
   Patch,
   Param,
   Delete,
@@ -14,7 +15,7 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 import { GetCurrentUserId, Public } from 'src/common/decorators';
 import { Tokens } from 'src/auth/types';
 import { User } from './entities/user.entity';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('user')
 @Controller('user')
@@ -30,8 +31,17 @@ export class UserController {
 
   @Get()
   @Public()
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'email', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'perPage', required: false })
+  findAll(
+    @Query('name') name?: string,
+    @Query('email') email?: string,
+    @Query('page') page?: number,
+    @Query('perPage') perPage?: number,
+  ) {
+    return this.userService.findAll(name, email, page, perPage);
   }
 
   @Get(':id')
@@ -40,28 +50,34 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('self')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
   update(
     @GetCurrentUserId() userId: string,
-    @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(userId, id, updateUserDto);
+    return this.userService.update(userId, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('self')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
-  remove(@GetCurrentUserId() userId: string, @Param('id') id: string) {
-    return this.userService.remove(userId, id);
+  remove(@GetCurrentUserId() userId: string) {
+    return this.userService.remove(userId);
   }
 
-  @Post(':id')
+  @Post('toggleFollow/:id')
   @ApiBearerAuth('access-token')
   @HttpCode(HttpStatus.OK)
   toggleFollow(@GetCurrentUserId() userId: string, @Param('id') id: string) {
     return this.userService.toggleFollow(userId, id);
+  }
+
+  @Get('self')
+  @ApiBearerAuth('access-token')
+  @HttpCode(HttpStatus.OK)
+  me(@GetCurrentUserId() userId: string) {
+    return this.userService.findOne(userId);
   }
 }

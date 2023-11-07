@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   NotFoundException,
   BadRequestException,
@@ -26,7 +25,7 @@ export class UserService {
     });
 
     if (hasUser) {
-      throw new ForbiddenException('Access Denied');
+      throw new BadRequestException('User already exists');
     }
 
     const hash = await argon2.hash(createUserDto.password);
@@ -34,6 +33,11 @@ export class UserService {
       data: {
         email: createUserDto.email,
         name: createUserDto.name,
+        profile: {
+          create: {
+            bio: createUserDto.bio,
+          },
+        },
         hash: hash,
       },
     });
@@ -48,14 +52,45 @@ export class UserService {
     return tokens;
   }
 
-  async findAll(): Promise<User[]> {
-    const users = await this.prisma.user.findMany({});
+  async findAll(
+    name: string,
+    email: string,
+    page = 1,
+    perPage = 100,
+  ): Promise<{
+    data: User[];
+    total: number;
+    page: number;
+    perPage: number;
+    totalPages: number;
+  }> {
+    const where: any = {};
+
+    if (name) {
+      where.name = {
+        contains: name,
+      };
+    }
+
+    if (email) {
+      where.email = {
+        contains: email,
+      };
+    }
+    const users = await this.prisma.user.findMany({
+      where,
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    const totalUsers = await this.prisma.user.count({ where });
+    const totalPages = Math.ceil(totalUsers / perPage);
+
     const returnUsers = users.map((user) => {
       delete user.hash;
       delete user.hashedRT;
       return user;
     });
-    return returnUsers;
+    return { data: returnUsers, total: totalUsers, page, perPage, totalPages };
   }
 
   async findOne(id: string): Promise<User> {
@@ -81,14 +116,7 @@ export class UserService {
     return user;
   }
 
-  async update(
-    userId: string,
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<User> {
-    if (userId != id) {
-      throw new ForbiddenException('Access Denied');
-    }
+  async update(userId: string, updateUserDto: UpdateUserDto): Promise<User> {
     let user = null;
     try {
       user = await this.prisma.user.update({
@@ -96,7 +124,12 @@ export class UserService {
           id: userId,
         },
         data: {
-          ...updateUserDto,
+          name: updateUserDto.name,
+          profile: {
+            update: {
+              bio: updateUserDto.bio,
+            },
+          },
         },
       });
     } catch (error) {
@@ -109,11 +142,7 @@ export class UserService {
     return user;
   }
 
-  async remove(userId: string, id: string) {
-    if (userId != id) {
-      throw new ForbiddenException('Access Denied');
-    }
-
+  async remove(userId: string) {
     try {
       await this.prisma.user.delete({
         where: {
