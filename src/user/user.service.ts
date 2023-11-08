@@ -135,6 +135,7 @@ export class UserService {
           profile: {
             update: {
               bio: updateUserDto.bio,
+              image: updateUserDto.image,
             },
           },
         },

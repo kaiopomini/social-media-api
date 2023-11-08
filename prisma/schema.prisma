@@ -31,7 +31,8 @@ model User {
 
 model Profile {
   id     String @id @default(uuid())
-  bio    String
+  bio    String?
+  image  String? 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique @db.Uuid
 

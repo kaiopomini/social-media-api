@@ -13,4 +13,11 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   bio: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  image: string;
 }
