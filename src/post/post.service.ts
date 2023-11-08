@@ -26,11 +26,21 @@ export class PostService {
         ownerId: userId,
       },
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         likes: true,
         comments: {
           include: {
-            owner: true,
+            owner: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -47,11 +57,21 @@ export class PostService {
         id: postId,
       },
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         likes: true,
         comments: {
           include: {
-            owner: true,
+            owner: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },

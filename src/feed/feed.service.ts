@@ -9,11 +9,21 @@ export class FeedService {
   async getFeedForPublic(): Promise<any[]> {
     const posts = await this.prisma.post.findMany({
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         likes: true,
         comments: {
           include: {
-            owner: true,
+            owner: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -40,11 +50,21 @@ export class FeedService {
 
     const posts = await this.prisma.post.findMany({
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         likes: true,
         comments: {
           include: {
-            owner: true,
+            owner: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
