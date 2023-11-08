@@ -55,8 +55,8 @@ export class UserService {
   async findAll(
     name: string,
     email: string,
-    page = 1,
-    perPage = 100,
+    page: number,
+    perPage: number,
   ): Promise<{
     data: User[];
     total: number;
@@ -65,7 +65,7 @@ export class UserService {
     totalPages: number;
   }> {
     const where: any = {};
-
+    console.log(page, perPage);
     if (name) {
       where.name = {
         contains: name,
@@ -81,8 +81,8 @@ export class UserService {
     }
     const users = await this.prisma.user.findMany({
       where,
-      skip: (+page - 1) * +perPage,
-      take: +perPage,
+      skip: (page - 1) * perPage,
+      take: perPage,
       include: {
         profile: true,
         userFollowed: true,
@@ -90,7 +90,7 @@ export class UserService {
       },
     });
     const totalUsers = await this.prisma.user.count({ where });
-    const totalPages = Math.ceil(totalUsers / +perPage);
+    const totalPages = Math.ceil(totalUsers / perPage);
 
     const returnUsers = users.map((user) => {
       delete user.hash;
