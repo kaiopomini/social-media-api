@@ -28,7 +28,14 @@ export class PostService {
       include: {
         owner: true,
         likes: true,
-        comments: true,
+        comments: {
+          include: {
+            owner: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
     return posts;
@@ -42,7 +49,11 @@ export class PostService {
       include: {
         owner: true,
         likes: true,
-        comments: true,
+        comments: {
+          include: {
+            owner: true,
+          },
+        },
       },
     });
 

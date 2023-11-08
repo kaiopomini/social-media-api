@@ -6,14 +6,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class FeedService {
   constructor(private prisma: PrismaService) {}
 
-  c;
-
   async getFeedForPublic(): Promise<any[]> {
     const posts = await this.prisma.post.findMany({
       include: {
         owner: true,
         likes: true,
-        comments: true,
+        comments: {
+          include: {
+            owner: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
@@ -37,7 +42,14 @@ export class FeedService {
       include: {
         owner: true,
         likes: true,
-        comments: true,
+        comments: {
+          include: {
+            owner: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
