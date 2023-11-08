@@ -63,27 +63,35 @@ export class FeedService {
   }
 
   private calculeRelevance(post: any, user?: any) {
-    const LOG_BASE = 10; // Base do logaritmo, você pode ajustar conforme necessário.
     let relevance = 0;
 
-    // Calcule a idade do post em milissegundos.
+    relevance += post.likes.length * 0.3; // 0.30 pontos por cada like.
+    relevance += post.comments.length * 0.2; // 0.20 pontos por cada comentário.
+
+    // Calcule a idade do post em horas.
     const now: Date = new Date();
     const postCreatedAt: Date = new Date(post.createdAt);
-    const millisecondsDifference: number = Math.abs(
-      now.getTime() - postCreatedAt.getTime(),
-    );
+    const hoursDifference: number =
+      Math.abs(now.getTime() - postCreatedAt.getTime()) / (1000 * 60 * 60);
 
-    // Calcule a relevância baseada na idade usando logaritmo.
-    const ageRelevance =
-      Math.log10(millisecondsDifference + 1) / Math.log10(LOG_BASE);
-
-    // Calcule a relevância das curtidas e comentários usando logaritmo.
-    relevance += (Math.log10(post.likes.length + 1) / Math.log10(LOG_BASE)) * 1;
-    relevance +=
-      (Math.log10(post.comments.length + 1) / Math.log10(LOG_BASE)) * 1;
-
-    // Some os componentes de relevância.
-    relevance += ageRelevance;
+    if (hoursDifference <= 0.1) {
+      relevance += 50;
+    } else if (hoursDifference <= 0.2) {
+      relevance += 45;
+    } else if (hoursDifference <= 0.3) {
+      relevance += 40;
+    } else if (hoursDifference <= 0.4) {
+      relevance += 35;
+    } else if (hoursDifference <= 0.5) {
+      relevance += 20;
+    } else if (hoursDifference <= 0.6) {
+      relevance += 15;
+    } else if (hoursDifference <= 0.7) {
+      relevance += 10;
+    } else if (hoursDifference > 0.7) {
+      // relevance -= Math.floor(hoursDifference / 240);
+      relevance -= hoursDifference;
+    }
 
     if (
       relevance >= 0 &&
