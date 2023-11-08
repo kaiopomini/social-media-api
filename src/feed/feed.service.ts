@@ -32,10 +32,10 @@ export class FeedService {
       },
     });
 
-    posts?.sort(
-      (postA, postB) =>
-        this.calculeRelevance(postB) - this.calculeRelevance(postA),
-    );
+    // posts?.sort(
+    //   (postA, postB) =>
+    //     this.calculeRelevance(postB) - this.calculeRelevance(postA),
+    // );
 
     return posts;
   }
@@ -73,11 +73,10 @@ export class FeedService {
       },
     });
 
-    // Ordene o feed por relevância (em ordem decrescente).
-    posts?.sort(
-      (postA, postB) =>
-        this.calculeRelevance(postB, user) - this.calculeRelevance(postA, user),
-    );
+    // posts?.sort(
+    //   (postA, postB) =>
+    //     this.calculeRelevance(postB, user) - this.calculeRelevance(postA, user),
+    // );
 
     return posts;
   }
