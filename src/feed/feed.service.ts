@@ -62,25 +62,27 @@ export class FeedService {
     const hoursDifference: number =
       Math.abs(now.getTime() - postCreatedAt.getTime()) / (1000 * 60 * 60);
 
-    if (hoursDifference <= 4) {
+    if (hoursDifference <= 0.1) {
       relevance += 50;
-    } else if (hoursDifference <= 8) {
+    } else if (hoursDifference <= 0.2) {
       relevance += 45;
-    } else if (hoursDifference <= 12) {
+    } else if (hoursDifference <= 0.3) {
       relevance += 40;
-    } else if (hoursDifference <= 24) {
+    } else if (hoursDifference <= 0.4) {
       relevance += 35;
-    } else if (hoursDifference <= 168) {
+    } else if (hoursDifference <= 0.5) {
       relevance += 20;
-    } else if (hoursDifference <= 336) {
+    } else if (hoursDifference <= 0.6) {
       relevance += 15;
-    } else if (hoursDifference <= 720) {
+    } else if (hoursDifference <= 0.7) {
       relevance += 10;
-    } else if (hoursDifference > 1440) {
-      relevance -= 5;
+    } else if (hoursDifference > 0.7) {
+      // relevance -= Math.floor(hoursDifference / 240);
+      relevance -= hoursDifference;
     }
 
     if (
+      relevance >= 0 &&
       user?.userFollowing.some((followingUser: any) => {
         return followingUser.userFollowedId === post.ownerId;
       })
