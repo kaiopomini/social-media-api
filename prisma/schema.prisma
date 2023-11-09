@@ -30,11 +30,11 @@ model User {
 }
 
 model Profile {
-  id     String @id @default(uuid())
-  bio    String?
-  image  String? 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique @db.Uuid
+  id     String  @id @default(uuid())
+  bio    String? @default("ghost")
+  image  String?
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String  @unique @db.Uuid
 
   @@map("Profiles")
 }
